@@ -48,6 +48,12 @@
       // And now construction is finished, add any passed Markers to the map
       if ( markers && markers.length ) { this.addMarkers( markers ); }
 
+      // Finally, listen for first idle event (signals the map is done loading
+      // things) and tell everyone above we're done loading
+      google.maps.event.addListenerOnce( this.state.map, 'idle', function () {
+        $scope.$emit( 'googleMapLoaded', $scope.googleMap );
+      });
+
       // And back we go
       return this;
     } else {

@@ -56,9 +56,6 @@ angular.module( 'googlyMapulous' ).directive( 'googleMap', [ 'googleMaps', funct
         // $scope for reference later from controller
         $scope.googleMap = new googleMaps.GoogleMap( $element[ 0 ].children[ 0 ].children[ 0 ], $scope, $compile, options );
 
-        // Fire event at the point so the outer control knows we're done
-        $scope.$emit( 'googleMapLoaded', $scope.googleMap );
-
         // Also set a scope variable for checking map loaded status
         $scope.mapLoaded = true;
       }
@@ -128,6 +125,12 @@ angular.module( 'googlyMapulous' ).provider( 'googleMaps', [ function () {
 
       // And now construction is finished, add any passed Markers to the map
       if ( markers && markers.length ) { this.addMarkers( markers ); }
+
+      // Finally, listen for first idle event (signals the map is done loading
+      // things) and tell everyone above we're done loading
+      google.maps.event.addListenerOnce( this.state.map, 'idle', function () {
+        $scope.$emit( 'googleMapLoaded', $scope.googleMap );
+      });
 
       // And back we go
       return this;
